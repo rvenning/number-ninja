@@ -1,0 +1,9 @@
+{
+  "name": "number-ninja",
+  "private": true,
+  "description": "Number Ninja — a times-tables slicing arcade built on gamekit.",
+  "scripts": {
+    "test": "node --test",
+    "icons": "node tools/make-icons.js"
+  }
+}

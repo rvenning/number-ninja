@@ -1,0 +1,208 @@
+/* Number Ninja — game styles on top of lib/gk-base.css.
+   The kit's primitives (.btn, .screen, .topbar, .modal, .toast, profile roster)
+   are re-themed through the --gk-* custom properties rather than forked. */
+
+:root {
+  --gk-accent: #ffb648;  --gk-accent-sh: #b87a22;
+  /* Darker than the kit's defaults on purpose: white lettering on gk-base's
+     #2fbf7a measures 2.37:1 and on #3f9be0 3.01:1, so the game's main call to
+     action was the least readable thing on the screen. These carry white at
+     3.3:1 and 3.9:1 (the bar for text this large) and still read as the same
+     colours. Measured, not eyeballed — a light-theme desktop preview hides it. */
+  --gk-green:  #22a066;  --gk-green-sh:  #14663f;
+  --gk-blue:   #2f86c9;  --gk-blue-sh:   #1e5c8e;
+  --gk-ink: #0d0824;
+  --nn-night: #150f33;
+  --nn-plum: #241a55;
+  --nn-gold: #ffe066;
+  --nn-jade: #7ee6b0;
+  --nn-rose: #ff8fb0;
+  --nn-paper: #fff6df;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+/* Paint the ROOT, not just the body. Installed to the Home Screen, iOS extends
+   the visual viewport past `height:100%` under `viewport-fit=cover`, so a
+   background set only on body stops short of the bottom safe area and the strip
+   behind the home indicator falls through to the page canvas — which renders
+   WHITE. Invisible in Safari and in any desktop preview; only shows standalone. */
+html { background: var(--nn-night); }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: 'Baloo 2', 'Comic Sans MS', system-ui, sans-serif;
+  color: #fff;
+  min-height: 100vh;   /* every screen is position:fixed, so body has almost no
+                          content height — without this the root colour shows
+                          through beneath body's gradient and the splash is two-tone */
+  background:
+    radial-gradient(ellipse at 18% -8%, #3b2a7a 0%, transparent 55%),
+    radial-gradient(ellipse at 88% 112%, #0b0722 0%, transparent 60%),
+    linear-gradient(180deg, #2a1f5e 0%, var(--nn-night) 70%);
+  /* AFTER the shorthand — the shorthand resets background-color to transparent,
+     so declaring the colour first would silently do nothing. */
+  background-color: var(--nn-night);
+  -webkit-user-select: none; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+.screen { background: transparent; }
+/* gk-base's plain .btn is white on --gk-accent. This game's accent is a bright
+   dojo gold, and white on it is ~1.9:1 — unreadable. Never hardcode #fff on a
+   themed fill: the label takes the opposing colour, and only the deliberately
+   darkened fills below keep white. */
+.btn { color: var(--nn-night); }
+.btn.green, .btn.blue, .btn.grey, .btn.danger, .btn.ghost { color: #fff; }
+h2 { font-size: 22px; }
+h3.sec { font-size: 15px; opacity: .75; margin: 18px 0 8px; letter-spacing: .5px; }
+
+/* -------------------------------- splash --------------------------------- */
+.splash-inner {
+  min-height: 100%; width: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 6px;
+  padding: 24px; text-align: center;
+}
+.splash-orbit {
+  font-size: 30px; letter-spacing: 16px; font-weight: 800; color: var(--nn-gold);
+  animation: bob 3s ease-in-out infinite;
+}
+@keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-7px) } }
+.logo {
+  font-size: clamp(38px, 11vw, 62px); line-height: 0.95; font-weight: 800;
+  color: var(--nn-paper);
+  text-shadow: 0 4px 0 #6d4bb8, 0 8px 0 rgba(0,0,0,.45);
+  margin: 6px 0 2px;
+}
+.logo span { display: block; color: var(--nn-gold); text-shadow: 0 4px 0 #b8952a, 0 8px 0 rgba(0,0,0,.45); }
+.tagline { font-size: 15.5px; opacity: .92; margin-bottom: 14px; max-width: 340px; }
+.btn.big { font-size: 22px; padding: 18px 34px; min-width: 260px; }
+.btn.ghost { background: rgba(255,255,255,.14); box-shadow: 0 4px 0 rgba(0,0,0,.3); }
+.keys-hint { font-size: 12.5px; opacity: .55; margin-top: 10px; display: none; }
+@media (pointer: fine) { .keys-hint { display: block; } }
+.splash-foot { margin-top: 16px; display: flex; align-items: center; gap: 14px; opacity: .9; font-size: 14px; }
+
+/* --------------------------------- dojo ---------------------------------- */
+.dojo-player { font-size: 17px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.dojo-stars {
+  font-size: 13px; font-weight: 800; background: rgba(255,224,102,.18);
+  color: var(--nn-gold); padding: 5px 10px; border-radius: 11px; white-space: nowrap;
+}
+.fact-meter { background: rgba(255,255,255,.09); border-radius: 16px; padding: 12px 14px; margin-bottom: 10px; }
+.fact-head { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; opacity: .85; margin-bottom: 7px; }
+.fact-track { height: 12px; border-radius: 7px; background: rgba(0,0,0,.35); overflow: hidden; }
+.fact-track i { display: block; height: 100%; width: 0; border-radius: 7px; background: linear-gradient(90deg, #7ee6b0, #ffe066); transition: width .4s ease; }
+/* minmax(0,…) not 1fr: an `auto` minimum refuses to shrink below its content
+   and the last column spills off a narrow phone. */
+.stat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
+.stat { background: rgba(255,255,255,.09); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.stat .k { font-size: 12px; opacity: .7; font-weight: 700; }
+.stat .v { font-size: 21px; font-weight: 800; color: var(--nn-gold); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row-btns2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.nudge { font-size: 13px; opacity: .75; text-align: center; margin-top: 8px; }
+.nudge.small { font-size: 12px; opacity: .6; }
+
+/* belt list */
+.belt-list { display: flex; flex-direction: column; gap: 9px; padding-bottom: 20px; }
+.belt {
+  display: flex; align-items: center; gap: 11px; width: 100%; text-align: left;
+  border: none; border-radius: 16px; padding: 11px 13px; cursor: pointer;
+  font-family: inherit; color: #fff; min-width: 0;
+  background: rgba(255,255,255,.1); box-shadow: 0 4px 0 rgba(0,0,0,.3);
+}
+.belt.done { background: rgba(126,230,176,.16); box-shadow: 0 4px 0 rgba(28,138,86,.5); }
+.belt.locked { opacity: .45; cursor: default; box-shadow: none; }
+.belt:not(.locked):active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,.3); }
+.belt-icon {
+  flex: 0 0 auto; width: 42px; height: 42px; border-radius: 13px; font-size: 21px;
+  display: flex; align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--tint) 26%, transparent);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--tint) 55%, transparent);
+}
+.belt-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.belt-name { font-weight: 800; font-size: 15.5px; }
+.belt-sub { font-size: 11.5px; opacity: .7; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.belt-stars { flex: 0 0 auto; font-size: 14px; color: var(--nn-gold); letter-spacing: 1px; }
+
+/* --------------------------------- den ----------------------------------- */
+.den-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; padding-bottom: 20px; margin-top: 10px; }
+.pet {
+  background: rgba(255,255,255,.09); border-radius: 18px; padding: 13px 11px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0;
+}
+.pet-icon {
+  font-size: 34px; line-height: 1.1; filter: drop-shadow(0 0 10px color-mix(in srgb, var(--hue) 55%, transparent));
+}
+.pet.stage-egg .pet-icon { filter: none; opacity: .8; }
+.pet-name { font-weight: 800; font-size: 15px; }
+.pet-tag { font-size: 11px; opacity: .65; text-align: center; }
+.pet-bar { width: 100%; height: 8px; border-radius: 5px; background: rgba(0,0,0,.35); overflow: hidden; margin-top: 4px; }
+.pet-bar i { display: block; height: 100%; border-radius: 5px; }
+.pet-stage { font-size: 11px; opacity: .8; font-weight: 700; }
+
+/* ------------------------------- practice -------------------------------- */
+.prac-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 12px; padding-bottom: 20px; }
+.prac {
+  border: none; border-radius: 16px; padding: 12px 6px; cursor: pointer;
+  font-family: inherit; color: #fff; min-width: 0;
+  background: rgba(255,255,255,.1); box-shadow: 0 4px 0 rgba(0,0,0,.3);
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+}
+.prac:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,.3); }
+.prac-n { font-size: 21px; font-weight: 800; color: var(--nn-gold); }
+.prac-icon { font-size: 22px; }
+.prac-bar { width: 100%; height: 7px; border-radius: 4px; background: rgba(0,0,0,.35); overflow: hidden; }
+.prac-bar i { display: block; height: 100%; border-radius: 4px; }
+
+/* ------------------------------ game screen ------------------------------ */
+/* NEVER set `display` in a plain #screen-* rule: an ID selector outranks both
+   `.screen{display:none}` and `.screen.active{display:flex}`, which pins the
+   game screen visible forever on top of everything else. Scope it to .active. */
+#screen-game { padding: 0; overflow: hidden; touch-action: none; align-items: stretch; }
+#screen-game.active { display: flex; }
+.gamebar {
+  display: flex; align-items: center; gap: 10px;
+  padding: calc(6px + env(safe-area-inset-top)) 12px 6px;
+  background: rgba(9,6,26,.85); z-index: 5;
+}
+.gamebar .iconbtn.small { width: 36px; height: 36px; font-size: 16px; border-radius: 11px; }
+.hud { font-weight: 800; font-size: 14px; white-space: nowrap; }
+.hud.hearts { font-size: 13px; letter-spacing: -1px; }
+.hud.combo { color: var(--nn-jade); min-width: 24px; }
+.hud.combo.hot { color: var(--nn-rose); animation: pop .35s ease-out infinite alternate; }
+@keyframes pop { from { transform: scale(1) } to { transform: scale(1.14) } }
+.hud.round { margin-left: auto; opacity: .85; }
+.hud.score { color: var(--nn-gold); font-size: 17px; }
+.game-stage {
+  position: relative; flex: 1; width: 100%; overflow: hidden; touch-action: none;
+  background: var(--nn-night);
+}
+/* The canvas is a replaced element: without an explicit CSS size it renders at
+   its ATTRIBUTE size (logical x DPR) and overflows every retina screen. Setting
+   it here rather than in resize() means the display size can never disagree
+   with the stage, however the stage reflows. */
+#cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+
+/* -------------------------------- results -------------------------------- */
+.res-inner {
+  min-height: 100%; width: 100%; max-width: 480px; margin: 0 auto;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 7px; padding: 24px; text-align: center;
+}
+.res-emoji { font-size: 58px; animation: bob 2s ease-in-out infinite; }
+.res-title { font-size: 25px; }
+.res-stars { font-size: 27px; color: var(--nn-gold); letter-spacing: 3px; }
+.res-score { font-size: 42px; font-weight: 800; color: var(--nn-gold); line-height: 1; }
+.res-sub { font-size: 14px; opacity: .8; }
+.res-stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 14px; font-size: 13.5px; opacity: .9; margin-top: 6px; }
+.res-note {
+  font-size: 13.5px; margin-top: 10px; padding: 10px 14px; border-radius: 14px;
+  background: rgba(255,255,255,.08); line-height: 1.5; max-width: 340px;
+}
+.res-note:empty { display: none; }
+.res-note.work { background: rgba(255,182,72,.16); color: #ffe0ae; }
+.res-note.perfect { background: rgba(126,230,176,.16); color: #c6f7de; }
+.res-evo { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.evo { font-size: 14px; background: rgba(199,139,255,.18); border-radius: 12px; padding: 8px 14px; }
+.res-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; justify-content: center; }
+
+/* ------------------------------ leaderboard ------------------------------ */
+.lb-stat { font-size: 12.5px; opacity: .9; margin-left: 8px; white-space: nowrap; }

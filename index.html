@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Number Ninja 🥷 — Slice Your Times Tables</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#150f33">
+<meta name="description" content="Numbers fly up, you slice the right ones. Learn the 2 to 12 times tables across twelve belts, and grow eleven dojo spirits — one for every table.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Number Ninja">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="lib/gk-base.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥷</text></svg>">
+</head>
+<body>
+
+<!-- Splash -->
+<div class="screen active" id="screen-splash">
+  <div class="splash-inner">
+    <div class="splash-orbit" aria-hidden="true"><span>7</span><span>🥷</span><span>56</span></div>
+    <h1 class="logo">NUMBER<span>NINJA</span></h1>
+    <p class="tagline">Numbers fly up. Slice the right ones. Learn every times table from 2 to 12 — and wake the eleven dojo spirits.</p>
+    <button class="btn big" id="btn-continue-as" style="display:none"></button>
+    <button class="btn big green" id="btn-start" onclick="App.play()">🥷 Enter the Dojo</button>
+    <button class="btn ghost" id="btn-install" style="display:none">📲 Add to Home Screen</button>
+    <p class="keys-hint">⌨️ Drag to slice · P to pause</p>
+    <div class="splash-foot">
+      <span id="sync-badge">⏳ connecting…</span>
+      <button class="btn-sound iconbtn">🔊</button>
+    </div>
+  </div>
+</div>
+
+<!-- Profile picker (roster + PIN modals are rendered by GK.Profiles) -->
+<div class="screen" id="screen-profiles">
+  <header class="topbar">
+    <button class="iconbtn" onclick="App.showScreen('splash')">←</button>
+    <h2 class="grow">Who's training?</h2>
+    <button class="btn-sound iconbtn">🔊</button>
+  </header>
+  <div class="content">
+    <div class="profile-list" id="profile-list"></div>
+  </div>
+</div>
+
+<!-- Dojo hub -->
+<div class="screen" id="screen-dojo">
+  <header class="topbar">
+    <button class="iconbtn" onclick="App.play()">👥</button>
+    <div class="dojo-player grow" id="dojo-player"></div>
+    <span class="dojo-stars" id="dojo-stars">0★</span>
+    <button class="iconbtn" onclick="App.showLeaderboard()">🏆</button>
+    <button class="btn-sound iconbtn">🔊</button>
+  </header>
+  <div class="content">
+    <div class="fact-meter">
+      <div class="fact-head"><span>🧠 Facts mastered</span><span id="stat-facts">0/66</span></div>
+      <div class="fact-track"><i id="fact-fill"></i></div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat"><span class="k">🥚 Spirits awake</span><span class="v" id="stat-den">0/11</span></div>
+      <div class="stat"><span class="k">⚡ Best test</span><span class="v" id="stat-best">0</span></div>
+    </div>
+    <div class="row-btns2">
+      <button class="btn blue" onclick="App.showDen()">🥚 The Den</button>
+      <button class="btn blue" onclick="App.showPractice()">🧘 Practice</button>
+    </div>
+    <button class="btn green wide" id="btn-test" onclick="App.startTest()">⚡ Sensei's Test</button>
+    <p class="nudge" id="test-note"></p>
+    <h3 class="sec">🥋 Belts</h3>
+    <div class="belt-list" id="belt-list"></div>
+  </div>
+</div>
+
+<!-- The Den -->
+<div class="screen" id="screen-den">
+  <header class="topbar">
+    <button class="iconbtn" onclick="App.showDojo()">←</button>
+    <h2 class="grow">🥚 The Den</h2>
+  </header>
+  <div class="content">
+    <p class="nudge" id="den-sub"></p>
+    <p class="nudge small">Every spirit grows as you master its table. Nothing to buy — only maths.</p>
+    <div class="den-grid" id="den-grid"></div>
+  </div>
+</div>
+
+<!-- Practice -->
+<div class="screen" id="screen-practice">
+  <header class="topbar">
+    <button class="iconbtn" onclick="App.showDojo()">←</button>
+    <h2 class="grow">🧘 Practice</h2>
+  </header>
+  <div class="content">
+    <p class="nudge">Pick a table and drill it. No hearts, no score — stop whenever you like.</p>
+    <div class="prac-grid" id="prac-grid"></div>
+  </div>
+</div>
+
+<!-- Leaderboard -->
+<div class="screen" id="screen-leaderboard">
+  <header class="topbar">
+    <button class="iconbtn" onclick="App.showDojo()">←</button>
+    <h2 class="grow">🏆 Family Dojo</h2>
+    <button class="btn-sound iconbtn">🔊</button>
+  </header>
+  <div class="content">
+    <div class="lb-rows" id="lb-rows"></div>
+  </div>
+</div>
+
+<!-- Game -->
+<div class="screen" id="screen-game">
+  <header class="gamebar">
+    <button class="iconbtn small" onclick="App.pause()">⏸</button>
+    <span class="hud hearts" id="hud-hearts">❤️❤️❤️</span>
+    <span class="hud combo" id="hud-combo"></span>
+    <span class="hud round" id="hud-round"></span>
+    <span class="hud score" id="hud-score">0</span>
+  </header>
+  <div class="game-stage">
+    <canvas id="cv"></canvas>
+  </div>
+</div>
+
+<!-- Results -->
+<div class="screen" id="screen-results">
+  <div class="res-inner">
+    <div class="res-emoji" id="res-emoji">🥋</div>
+    <h2 class="res-title" id="res-title"></h2>
+    <div class="res-stars" id="res-stars"></div>
+    <div class="res-score" id="res-score">0</div>
+    <div class="res-sub" id="res-sub"></div>
+    <div class="res-stats" id="res-stats"></div>
+    <p class="res-note" id="res-note"></p>
+    <div class="res-evo" id="res-evo"></div>
+    <div class="res-actions">
+      <button class="btn grey" onclick="App.showDojo()">🏠 Dojo</button>
+      <button class="btn green" id="btn-again">↻ Try again</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pause -->
+<div class="modal" id="modal-pause">
+  <div class="sheet">
+    <h2>⏸ Paused</h2>
+    <button class="btn blue wide" id="btn-music" onclick="App.toggleMusic()">🎵 Music: On</button>
+    <div class="row-btns2">
+      <button class="btn green" onclick="App.resume()">▶️ Resume</button>
+      <button class="btn grey" onclick="App.quitRun()">🏠 Quit</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- gamekit (vendored from rvenning/gamekit into lib/) -->
+<script src="lib/gk-util.js"></script>
+<script src="lib/gk-audio.js"></script>
+<script src="lib/gk-ui.js"></script>
+<script src="lib/gk-storage.js"></script>
+<script src="lib/gk-profiles.js"></script>
+<script src="lib/gk-pwa.js"></script>
+<script src="lib/gk-fx.js"></script>
+<script src="lib/gk-debug.js"></script>
+<script>
+// Number Ninja's juice: sharp little shards from a cut, a shake that settles
+// fast so the numbers stay readable while three more are in the air.
+const Fx = GK.Fx.configure({
+  grav: 420, poolCap: 500, shakeMax: 10, shakeDecay: 34, shape: "square",
+  burstSpeed: 180, burstSize: 2.4, textSize: 14, textDy: -34, textCap: 24,
+  font: "'Baloo 2', system-ui, sans-serif",
+});
+const Tween = GK.Tween;
+</script>
+<script src="js/firebase-config.js"></script>
+<!-- data registries -->
+<script src="js/facts.js"></script>
+<script src="js/creatures.js"></script>
+<script src="js/belts.js"></script>
+<!-- systems -->
+<script src="js/storage.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/game.js"></script>
+<script src="js/render.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
