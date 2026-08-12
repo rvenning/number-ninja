@@ -19,7 +19,7 @@
 const BELTS = [
   {
     id: "white", name: "White Belt", icon: "🤍", tint: "#f2f4f8",
-    tables: [2, 10], hearts: 7, arc: 470, gap: 0.55, opts: 3,
+    tables: [2, 10], hearts: 7, arc: 470, gap: 0.82, opts: 3,
     blurb: "Doubles and tens — the two easiest tables there are.",
     waves: [
       { type: "answer", n: 8 },
@@ -30,7 +30,7 @@ const BELTS = [
   },
   {
     id: "yellow", name: "Yellow Belt", icon: "💛", tint: "#ffd94a",
-    tables: [5, 2], hearts: 7, arc: 465, gap: 0.55, opts: 3,
+    tables: [5, 2], hearts: 7, arc: 465, gap: 0.82, opts: 3,
     blurb: "Fives join in. Every answer ends in 5 or 0.",
     waves: [
       { type: "answer", n: 9, tables: [5] },
@@ -41,7 +41,7 @@ const BELTS = [
   },
   {
     id: "orange", name: "Orange Belt", icon: "🧡", tint: "#ff9f45",
-    tables: [2, 5, 10], hearts: 6, arc: 460, gap: 0.52, opts: 4,
+    tables: [2, 5, 10], hearts: 6, arc: 460, gap: 0.78, opts: 4,
     blurb: "All three easy tables at once — and backwards questions.",
     waves: [
       { type: "answer", n: 10 },
@@ -52,7 +52,7 @@ const BELTS = [
   },
   {
     id: "green", name: "Green Belt", icon: "💚", tint: "#5fd48a",
-    tables: [3], hearts: 6, arc: 450, gap: 0.5, opts: 4,
+    tables: [3], hearts: 6, arc: 450, gap: 0.76, opts: 4,
     blurb: "The three times table, on its own, until it sticks.",
     waves: [
       { type: "answer", n: 10 },
@@ -63,7 +63,7 @@ const BELTS = [
   },
   {
     id: "blue", name: "Blue Belt", icon: "💙", tint: "#4fb8ff",
-    tables: [4], hearts: 6, arc: 445, gap: 0.5, opts: 4,
+    tables: [4], hearts: 6, arc: 445, gap: 0.74, opts: 4,
     blurb: "Fours. Double a double — Padfoot will show you.",
     waves: [
       { type: "answer", n: 10 },
@@ -74,7 +74,7 @@ const BELTS = [
   },
   {
     id: "purple", name: "Purple Belt", icon: "💜", tint: "#a97bff",
-    tables: [3, 4, 5], hearts: 5, arc: 435, gap: 0.48, opts: 4,
+    tables: [3, 4, 5], hearts: 5, arc: 435, gap: 0.72, opts: 4,
     blurb: "Threes, fours and fives shuffled together.",
     waves: [
       { type: "answer", n: 11 },
@@ -85,7 +85,7 @@ const BELTS = [
   },
   {
     id: "brown", name: "Brown Belt", icon: "🤎", tint: "#b87a4a",
-    tables: [6], hearts: 5, arc: 430, gap: 0.46, opts: 4,
+    tables: [6], hearts: 5, arc: 430, gap: 0.70, opts: 4,
     blurb: "Sixes. Half of them you already know from the threes.",
     waves: [
       { type: "answer", n: 11 },
@@ -96,7 +96,7 @@ const BELTS = [
   },
   {
     id: "red", name: "Red Belt", icon: "❤️", tint: "#ff5f6d",
-    tables: [7], hearts: 5, arc: 425, gap: 0.45, opts: 5,
+    tables: [7], hearts: 5, arc: 425, gap: 0.68, opts: 5,
     blurb: "Sevens — the hardest table in the whole game. Take your time.",
     waves: [
       { type: "answer", n: 11 },
@@ -107,7 +107,7 @@ const BELTS = [
   },
   {
     id: "black", name: "Black Belt", icon: "🖤", tint: "#3b4152",
-    tables: [8], hearts: 4, arc: 420, gap: 0.44, opts: 5,
+    tables: [8], hearts: 4, arc: 420, gap: 0.66, opts: 5,
     blurb: "Eights. Double the fours, then double again.",
     waves: [
       { type: "answer", n: 12 },
@@ -118,7 +118,7 @@ const BELTS = [
   },
   {
     id: "black2", name: "Black Belt II", icon: "🥋", tint: "#5a6274",
-    tables: [9], hearts: 4, arc: 415, gap: 0.43, opts: 5,
+    tables: [9], hearts: 4, arc: 415, gap: 0.65, opts: 5,
     blurb: "Nines. The digits of every answer add up to nine.",
     waves: [
       { type: "answer", n: 12 },
@@ -132,7 +132,7 @@ const BELTS = [
     // Five rounds rather than four, because it covers two tables — so each one
     // is shorter, or this belt is half as long again as anything before it and
     // the hearts have to stretch across all of it.
-    tables: [11, 12], hearts: 6, arc: 410, gap: 0.42, opts: 5,
+    tables: [11, 12], hearts: 6, arc: 410, gap: 0.63, opts: 5,
     blurb: "Elevens and twelves — the last two, and Draco is waiting.",
     waves: [
       { type: "answer", n: 10 },
@@ -147,7 +147,7 @@ const BELTS = [
     // The longest belt with the fewest hearts. By the time she gets here the
     // campaign has taught her most of the bank, so what is left to test is
     // holding it together over sixty-odd questions rather than any one fact.
-    tables: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], hearts: 3, arc: 405, gap: 0.4, opts: 5,
+    tables: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], hearts: 3, arc: 405, gap: 0.60, opts: 5,
     blurb: "Everything, all at once. The whole dojo is watching.",
     waves: [
       { type: "answer", n: 16 },
@@ -191,8 +191,11 @@ function gradeRun(st) {
 const TEST = {
   hearts: 5,
   arc0: 470,
-  arcDecay: 0.973,
-  gap: 0.42,
+  // Decays a touch faster than it used to, because the gravity drop lengthened
+  // every flight: without this the run would end at the same QUESTION but take
+  // half again as long to get there.
+  arcDecay: 0.968,
+  gap: 0.62,
   opts: 5,
   tables: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
   arcAt(n) { return this.arc0 * Math.pow(this.arcDecay, n); },
@@ -201,4 +204,4 @@ const TEST = {
 // Free practice on one table. No hearts, no score, no ending — just the drill,
 // with the mastery model still recording every answer. This is where a wall in
 // the campaign is meant to be solved.
-const PRACTICE = { arc: 480, gap: 0.5, opts: 4 };
+const PRACTICE = { arc: 480, gap: 0.8, opts: 4 };

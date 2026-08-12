@@ -151,19 +151,27 @@ const Render = {
     this.clock += dt;
 
     if (Game.active) {
-      if (Game.paused || !Game.running) {
-        this.draw(0);
-      } else {
-        Game.update(dt);
-        Fx.update(dt);
-        this.drain();
-        this.draw(dt);
-        this.hud();
+      const live = Game.running && !Game.paused;
+      if (live) { Game.update(dt); Fx.update(dt); }
+
+      // Drain OUTSIDE the live branch, always. The "end" event is emitted by
+      // the very act of the run stopping, so gating the drain on the sim being
+      // live means the app is never told it is over and the game screen sits
+      // there forever. Two ways in: quitting from the pause sheet (emitted
+      // while paused), and the last heart going on a wrong slice (emitted from
+      // the pointer handler, so `running` is already false by the next frame).
+      // It only ever appeared to work because a run that ends inside update()
+      // is drained later in the same iteration.
+      this.drain();
+
+      // drain() can hand over to the results screen, which clears Game.active.
+      if (Game.active) {
+        if (live) { this.draw(dt); this.hud(); } else { this.draw(0); }
+        // A stage can resize with no resize event — a web font landing, the HUD
+        // row growing. Notice the drift rather than hunting every cause.
+        const b = this.cv.parentElement.getBoundingClientRect();
+        if (b.width > 50 && Math.abs(b.width - this.W) > 1) this.resize();
       }
-      // A stage can resize with no resize event — a web font landing, the HUD
-      // row growing. Notice the drift rather than hunting every cause.
-      const b = this.cv.parentElement.getBoundingClientRect();
-      if (b.width > 50 && Math.abs(b.width - this.W) > 1) this.resize();
     }
     if (typeof GK.Debug !== "undefined") GK.Debug.frame(dt);
     requestAnimationFrame((t2) => this.loop(t2));

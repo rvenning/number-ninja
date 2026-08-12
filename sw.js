@@ -1,6 +1,6 @@
 // Number Ninja service worker — network-first, cache fallback.
 // BUMP the cache name on ANY shell change or devices keep serving the old build.
-const CACHE = "number-ninja-v1";
+const CACHE = "number-ninja-v2";
 const SHELL = [
   ".",
   "index.html",

@@ -30,7 +30,7 @@ const S = loadScripts({
   files: ["tests/seed.js", "js/facts.js", "js/creatures.js", "js/belts.js", "js/game.js"],
   exports: ["Game", "BELTS", "TEST", "PRACTICE", "GRADE", "FACTS", "FACT_BY_KEY",
             "Mastery", "OPERAND_LOAD", "TABLES", "tableFacts",
-            "LW", "LH", "SLICE_Y", "OBJ_R", "MIN_LIVE_ARC", "LAUNCH_Y",
+            "LW", "LH", "SLICE_Y", "OBJ_R", "MIN_LIVE_ARC", "LAUNCH_Y", "GRAV",
             "segCircleHit", "gradeRun", "accuracyOf", "__reseed", "__rand"],
 });
 const { Game, BELTS, TEST, Mastery } = S;
@@ -492,6 +492,79 @@ test("the first wrong answer is a free think, the second is not", () => {
   cut(Game, wrongOnes[1]);
   assert.equal(Game.hearts, hearts - 1, "the second wrong answer was free too");
   Game.quit();
+});
+
+// How long a thrown number spends above the slice line — the actual answer
+// window, and the number Robert was feeling when he said it played too fast.
+const windowFor = (arc) => 2 * Math.sqrt((2 * (arc - S.MIN_LIVE_ARC)) / S.GRAV);
+
+test("there is time to think: every belt leaves a real answer window", () => {
+  // Robert reported the first build as slightly too fast (2026-08-13). Gravity
+  // came down to lengthen every flight without moving any geometry. These
+  // bounds exist so a later arc or gravity tweak cannot quietly make it
+  // frantic again — the floor is the point, the ceiling stops it going soggy.
+  const bad = BELTS.map((b) => {
+    const w = windowFor(b.arc);
+    if (w < 2.15) return `${b.name}: ${w.toFixed(2)}s to read five numbers and pick one`;
+    if (w > 3.4) return `${b.name}: ${w.toFixed(2)}s — sluggish`;
+    return null;
+  }).filter(Boolean);
+  assert.deepEqual(bad, []);
+  // And a beat between questions, which is where a child actually does the
+  // thinking she could not do while five numbers were in the air.
+  const rushed = BELTS.filter((b) => b.gap < 0.55).map((b) => `${b.name} ${b.gap}s`);
+  assert.deepEqual(rushed, [], "no breathing room between questions");
+  // The campaign should still get tighter from end to end, or the ramp is flat.
+  assert.ok(windowFor(BELTS[0].arc) > windowFor(BELTS[BELTS.length - 1].arc) + 0.15,
+    "the last belt is no tighter than the first");
+});
+
+// The renderer's frame loop is what actually delivers these to the app, and it
+// cannot be loaded headlessly — so it is verified in the preview by calling
+// Render.loop() for real. What CAN be pinned here is the engine's half of the
+// contract: every way a run can end emits exactly one `end`, including the two
+// that emit it from outside update() and shipped as a hang on 2026-08-13.
+function endEvents() { return Game.events.filter((e) => e.type === "end"); }
+
+test("every way a run can end announces itself exactly once", () => {
+  // 1. Quitting from the pause sheet — emitted while paused.
+  S.__reseed(1);
+  Game.start({ mode: "belt", beltIdx: 0, mastery: {} });
+  for (let i = 0; i < 120; i++) Game.update(1 / 60);
+  Game.paused = true;
+  Game.events = [];
+  Game.quit();
+  assert.equal(endEvents().length, 1, "quitting while paused told nobody");
+  assert.equal(endEvents()[0].result.reason, "quit");
+  assert.equal(Game.running, false);
+  Game.quit();
+  assert.equal(endEvents().length, 1, "a second quit emitted a second ending");
+
+  // 2. The last heart going on a wrong slice — emitted from the pointer path,
+  //    not from update(), which is exactly why the old loop never saw it.
+  S.__reseed(2);
+  Game.start({ mode: "belt", beltIdx: 0, mastery: {} });
+  Game.hearts = 1;
+  let guard = 0;
+  while (Game.running && guard++ < 60 * 300) {
+    Game.update(1 / 60);
+    const q = Game.q;
+    if (!q || q.done) continue;
+    const wrong = liveObjs(Game).find((o) => o.qid === q.id && !o.good);
+    if (wrong) { Game.events = []; cut(Game, wrong); }
+  }
+  assert.equal(Game.running, false, "the run never ended");
+  assert.equal(endEvents().length, 1, "running out of hearts on a slice told nobody");
+  assert.equal(endEvents()[0].result.reason, "out");
+
+  // 3. Finishing the belt — emitted from inside update(), the one that worked.
+  S.__reseed(3);
+  Game.start({ mode: "belt", beltIdx: 0, mastery: {} });
+  const brain = senseiBrain();
+  let f = 0;
+  while (Game.running && f++ < CAP) { Game.update(1 / 60); brain(Game, 1 / 60); }
+  assert.equal(Game.events.filter((e) => e.type === "end").length, 1);
+  assert.equal(Game.events.filter((e) => e.type === "end")[0].result.reason, "done");
 });
 
 test("a long clean chain buys a heart back, but never above the belt's own limit", () => {

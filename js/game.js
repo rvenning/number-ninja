@@ -18,7 +18,14 @@
 // endless run for a player who never gets one wrong.
 
 const LW = 320, LH = 480;              // fixed logical stage, portrait
-const GRAV = 620;                      // px/s^2
+// Gravity is the pacing dial for the whole game, and the right one: it stretches
+// every flight — and therefore how long she has to read five numbers and pick
+// one — without moving a single piece of geometry. Raising the arcs instead
+// would buy the same time and throw the numbers off the top of the screen.
+// Dropped from 620 on 2026-08-13; Robert reported it playing slightly too fast.
+// Note MIN_LIVE_ARC below is purely geometric, so this does not touch what ends
+// an endless run.
+const GRAV = 430;                      // px/s^2
 const LAUNCH_Y = LH + 34;              // numbers start just off the bottom
 const SLICE_Y = LH - 86;               // above this line a number is in play
 // A disc's radius is what decides whether two numbers can be told apart by a
@@ -430,7 +437,9 @@ const Game = {
         this.throwStream();
         // Streams breathe more than question sets do — a 2s flight with a 0.5s
         // gap would put four numbers in the air at once and stop being readable.
-        this.beat = this.gap * 1.55;
+        // The multiplier came down with the gravity change: flights are longer
+        // now, so the same multiplier would have left the dojo half empty.
+        this.beat = this.gap * 1.3;
       }
     } else if (this.objs.length === 0) {
       this.nextWave();
